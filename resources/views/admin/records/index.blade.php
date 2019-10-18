@@ -2,7 +2,6 @@
 
 @section('title', 'Index')
 
-
 @section('main')
 <h1>Records</h1>
 
