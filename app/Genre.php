@@ -10,4 +10,9 @@ class Genre extends Model
     {
         return $this->hasMany('App\Record');   // a genre has many records
     }
+
+    public function recordsordered()
+    {
+        return $this-> hasMany('App\Record') -> orderBy('artist');
+    }
 }

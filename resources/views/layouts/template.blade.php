@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ mix('css/app.css') }}">
+    @yield('css_after')
     <title>@yield('title', 'The Vinyl Shop')</title>
 
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/favicon_package_v0.16/apple-touch-icon.png">
@@ -22,5 +23,11 @@
 @include('shared.footer')
 
 <script src="{{ mix('js/app.js') }}"></script>
+@yield('script_after')
+@if(env('APP_DEBUG'))
+    <script>
+        $('form').attr('novalidate', 'true');
+    </script>
+@endif
 </body>
 </html>

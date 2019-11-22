@@ -20,9 +20,17 @@
     //return 'Contact info';
     return view('contact');
 }); */
+Auth::routes();
+
+// Route::get('/home', 'HomeController@index')->name('home');
 
 Route::view('/', 'home');
-Route::view('contact-us', 'contact');
+Route::get('contact-us', 'ContactUsController@show');
+Route::post('contact-us', 'ContactUsController@sendEmail');
+Route::get('shop', 'ShopController@index');
+Route::get('shop/{id}', 'ShopController@show');
+Route::get('shop_alt', 'ShopController@shopAlt');
+Route::get('logout', 'Auth\LoginController@logout');
 
 //Route::view('admin/records', 'admin.records.index');
 /*Route::get('admin/records', function (){
@@ -38,7 +46,7 @@ Route::view('contact-us', 'contact');
 });*/
 
 // New version with prefix and group
-Route::prefix('admin')->group(function () {
+Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::redirect('/', 'admin/records');
     Route::get('records', 'Admin\RecordController@index');
 });
