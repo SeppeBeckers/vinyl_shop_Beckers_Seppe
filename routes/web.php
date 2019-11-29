@@ -32,6 +32,7 @@ Route::get('shop/{id}', 'ShopController@show');
 Route::get('shop_alt', 'ShopController@shopAlt');
 Route::get('logout', 'Auth\LoginController@logout');
 
+
 //Route::view('admin/records', 'admin.records.index');
 /*Route::get('admin/records', function (){
     $records = [
@@ -49,4 +50,13 @@ Route::get('logout', 'Auth\LoginController@logout');
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::redirect('/', 'admin/records');
     Route::get('records', 'Admin\RecordController@index');
+    Route::resource('genres', 'Admin\GenreController');
+});
+
+Route::redirect('user', '/user/profile');
+Route::middleware(['auth'])->prefix('user')->group(function () {
+    Route::get('profile', 'User\ProfileController@edit');
+    Route::post('profile', 'User\ProfileController@update');
+    Route::get('password', 'User\PasswordController@edit');
+    Route::post('password', 'User\PasswordController@update');
 });
