@@ -10987,3 +10987,7 @@ main {
   visibility: hidden;
 }
 
+.btn[disabled] {
+  cursor: not-allowed;
+}
+

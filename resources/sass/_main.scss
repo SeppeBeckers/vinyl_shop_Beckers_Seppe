@@ -18,3 +18,7 @@ main {
 .close{
   visibility: hidden;
 }
+
+.btn[disabled] {
+  cursor: not-allowed;
+}
