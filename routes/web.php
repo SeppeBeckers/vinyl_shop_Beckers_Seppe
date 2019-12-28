@@ -50,7 +50,9 @@ Route::get('logout', 'Auth\LoginController@logout');
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::redirect('/', 'admin/records');
     Route::get('records', 'Admin\RecordController@index');
+    Route::get('genres/qryGenres', 'Admin\GenreController@qryGenres');
     Route::resource('genres', 'Admin\GenreController');
+    Route::resource('users', 'Admin\UserController');
 });
 
 Route::redirect('user', '/user/profile');
