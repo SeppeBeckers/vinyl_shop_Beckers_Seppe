@@ -171,8 +171,10 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         $user->delete();
-        session()->flash('success', "The user <b>$user->name</b> has been deleted");
-        return redirect('admin/users');
+        return response()->json([
+            'type' => 'success',
+            'text' => "The user <b>$user->name</b> has been deleted"
+        ]);
     }
 
 }

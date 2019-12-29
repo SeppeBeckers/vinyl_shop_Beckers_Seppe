@@ -60,19 +60,39 @@
                         <form action="/admin/users/{{ $user->id }}" method="post" class="deleteForm">
                             @method('delete')
                             @csrf
-                            <div class="btn-group btn-group-sm">
-                                <a href="/admin/users/{{ $user->id }}/edit" class="btn btn-outline-success"
-                                   data-toggle="tooltip"
-                                   title="Edit {{ $user->name }}">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <button type="button" class="btn btn-outline-danger"
-                                        data-toggle="tooltip"
-                                        data-name = "{{$user->name}}"
-                                        title="Delete {{ $user->name }}">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </div>
+                            @if (Auth::user()->id === $user->id )
+                                <div class="btn-group btn-group-sm">
+                                    <a href="/admin/users/{{ $user->id }}/edit" class="btn btn-outline-success disabled" id="edit"
+                                       data-toggle="tooltip"
+                                       title="Edit {{ $user->name }}">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-outline-danger disabled" id="delete"
+                                            data-toggle="tooltip"
+                                            data-name = "{{$user->name}}"
+                                            data-id = "{{$user->id}}"
+                                            data-auth = "{{Auth::user()->id}}"
+                                            title="Delete {{ $user->name }}">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                                @else
+                                <div class="btn-group btn-group-sm">
+                                    <a href="/admin/users/{{ $user->id }}/edit" class="btn btn-outline-success" id="edit"
+                                       data-toggle="tooltip"
+                                       title="Edit {{ $user->name }}">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-outline-danger " id="delete"
+                                            data-toggle="tooltip"
+                                            data-name = "{{$user->name}}"
+                                            data-id = "{{$user->id}}"
+                                            data-auth = "{{Auth::user()->id}}"
+                                            title="Delete {{ $user->name }}">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            @endif
                         </form>
                     </td>
                 </tr>
@@ -81,4 +101,62 @@
         </table>
     </div>
     {{ $users->links() }}
+@endsection
+@section('script_after')
+    <script>
+        $(function () {
+            $('tbody').on('click', '.btn-outline-danger', function () {
+                // Get data attributes from td tag
+                let id = $(this).data('id');
+                let name = $(this).data('name');
+                // Set some values for Noty
+                let text = `<p>Delete the user <b>${name}</b>?</p>`;
+                let type = 'warning';
+                let btnText = 'Delete User';
+                let btnClass = 'btn-success';
+
+                // Show Noty
+                let modal = new Noty({
+                    timeout: false,
+                    layout: 'center',
+                    modal: true,
+                    type: type,
+                    text: text,
+                    buttons: [
+                        Noty.button(btnText, `btn ${btnClass}`, function () {
+                            // Delete user and close modal
+                            deleteUser(id);
+                            modal.close();
+                        }),
+                        Noty.button('Cancel', 'btn btn-secondary ml-2', function () {
+                            modal.close();
+                        })
+                    ]
+                }).show();
+            });
+        });
+        // Delete a user
+        function deleteUser(id) {
+            let pars = {
+                '_token': '{{ csrf_token() }}',
+                '_method': 'delete'
+            };
+            $.post(`/admin/users/${id}`, pars, 'json')
+                .done(function (data) {
+                    console.log('data', data);
+                    // Show toast
+                    new Noty({
+                        type: data.type,
+                        text: data.text
+                    }).show();
+                    setTimeout(function(){
+                        location.reload();
+                    },3000);
+                })
+                .fail(function (e) {
+                    console.log('error', e);
+                });
+        }
+
+    </script>
 @endsection
