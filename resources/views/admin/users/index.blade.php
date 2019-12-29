@@ -6,15 +6,18 @@
     <h1>Users</h1>
     <form method="get" action="/admin/users" id="searchForm">
         <div class="row">
-            <div class="col-sm-6 mb-2">
+            <div class="col-sm-8 mb-2">
+                <label for="name">Filter Name or email</label>
                 <input type="text" class="form-control" name="name" id="name"
                        value="{{ request()->name}}" placeholder="Filter Name or email">
             </div>
             <div class="col-sm-4 mb-2">
+                <label for="sort">Sort by</label>
                 <select class="form-control" name="sort" id="sort">
                     @foreach($orderlist as $i => $sort )
-                        <option value="{{$i}}">{{$sort['name']}}</option>
-                        @endforeach
+                        <option value="{{$i}}"
+                                {{ (request()->sort == $i ? 'selected' : '') }}>{{$sort['name']}}</option>
+                    @endforeach
                 </select>
             </div>
         </div>
@@ -49,10 +52,10 @@
                     <td>{{ $user->email }}</td>
                     <td> @if ($user->active === 1)
                             <i class="fas fa-check"></i>
-                    @endif</td>
+                        @endif</td>
                     <td>@if ($user->admin === 1)
                             <i class="fas fa-check"></i>
-                    @endif</td>
+                        @endif</td>
                     <td>
                         <form action="/admin/users/{{ $user->id }}" method="post" class="deleteForm">
                             @method('delete')
@@ -78,17 +81,4 @@
         </table>
     </div>
     {{ $users->links() }}
-@endsection
-@section('script_after')
-    <script>
-        $(function () {
-            $('.deleteForm button').click(function () {
-                let name = $(this).data('name');
-                let msg = `Delete the user '${name}'?`;
-                if(confirm(msg)) {
-                    $(this).closest('form').submit();
-                }
-            })
-        });
-    </script>
 @endsection

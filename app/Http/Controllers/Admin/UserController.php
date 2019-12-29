@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Genre;
 use App\User;
 use Facades\App\Helpers\Json;
 use Illuminate\Http\Request;
@@ -16,6 +17,7 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
+
         $orderlist = [
             [
                 'name' => 'Name A -> Z',
@@ -53,26 +55,36 @@ class UserController extends Controller
                 'order' => 'asc',
                 'kolom' => 'admin'
             ],
+
         ];
 
         $name = '%' . $request->input('name') . '%';
 
-        $sort_field = $orderlist[$request->sort]['kolom'];
-        $sort_order = $orderlist[$request->sort]['order'];
-
-        $users = User::orderBy($sort_field, $sort_order)
-            ->where(function ($query) use ($name) {
-                $query->where('name', 'like', $name);
-            })
-            ->orWhere(function ($query) use ($name) {
-                $query->where('email', 'like', $name);
-            })
-            ->paginate(10)
-            ->appends(['name'=> $request->input('name')]);
-        $result = compact('users');
-        Json::dump($result);
-        return view('admin.users.index', $result);
-
+        if ($request -> sort == null) {
+            $users = User::orderBy('name')
+                ->where(function ($query) use ($name) {
+                    $query->where('name', 'like', $name)
+                        ->orWhere('email', 'like', $name);
+                })
+                ->paginate(10)
+                ->appends(['name' => $request->input('name'), 'sort' => $request->input('sort')]);
+            $result = compact('users', 'orderlist');
+            Json::dump($result);
+            return view('admin.users.index', $result);
+        }else {
+            $sort_field = $orderlist[$request->sort]['kolom'];
+            $sort_order = $orderlist[$request->sort]['order'];
+            $users = User::orderBy($sort_field, $sort_order)
+                ->where(function ($query) use ($name) {
+                    $query->where('name', 'like', $name)
+                        ->orWhere('email', 'like', $name);
+                })
+                ->paginate(10)
+                ->appends(['name' => $request->input('name'), 'sort' => $request->input('sort')]);
+            $result = compact('users', 'orderlist');
+            Json::dump($result);
+            return view('admin.users.index', $result);
+        }
 
     }
 
@@ -131,9 +143,20 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $this->validate($request,[
-            'name' => 'required|unique:users,name,' . $user->id
+            'name' => 'required|min:3|unique:users,name,'. $user->id,
+            'email' => 'required|min:3|unique:users,email,'. $user->id
         ]);
+
         $user->name = $request->name;
+        $user->email = $request->email;
+        if ($request->active == null)
+            $user->active = 0;
+        else
+            $user->active = 1;
+        if ($request->admin == null)
+            $user->admin = 0;
+        else
+            $user->admin = 1;
         $user->save();
         session()->flash('success', 'The user has been updated');
         return redirect('admin/users');
@@ -151,4 +174,5 @@ class UserController extends Controller
         session()->flash('success', "The user <b>$user->name</b> has been deleted");
         return redirect('admin/users');
     }
+
 }
